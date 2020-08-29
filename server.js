@@ -4,6 +4,9 @@ const url= require('url');
 const fs=require('fs');
 const events=require('events');
 const formidable=require('formidable');
+const credentials=require('./credentials');
+let transporter=credentials.transporter;
+let mailOptions=credentials.mailOptions;
 let port=8080;
 let eventEmitter=new events.EventEmitter();
 http.createServer(function(req, res)
@@ -24,10 +27,11 @@ http.createServer(function(req, res)
         res.writeHead(200, {'Content-Type': 'text/html'});
     // res.write(`You have request for ${req.url} endpoint`);
     res.write(result);
-    console.log(data);
+    // console.log(data);
     //return res.end();
     res.write(`\nServer is running on port ${port}\n\n`);
     res.write('Hello World\n\n'+ 'Date is  ' + date.currentDate());
+    // sendEmail('test', 'test');
     return res.end();
     });
     
@@ -41,3 +45,17 @@ function createScream()
 eventEmitter.on('scream', createScream);
 
 eventEmitter.emit('scream');
+
+
+function sendEmail(subject, body)
+    {
+        mailOptions.subject=subject;
+        mailOptions.text=body;
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
+    }
